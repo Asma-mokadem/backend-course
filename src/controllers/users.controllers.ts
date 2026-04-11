@@ -1,5 +1,5 @@
 import {type Request,type Response} from "express"
-import {getUserBySalary,filterByAge,userStat,getUserByAge,getUserByName,updateUserPartial,updateUser,getUserById,deleteUserById,getUsers,addUser, type User,type State, updateUserSalary} from '../data/users.service.js'
+import {getUserBySalary,filterByAge,userStat,getUserByAge,getUserByName,updateUserPartial,updateUser,getUserById,deleteUserById,getUsers,addUser, type User,type State, updateUserSalary} from '../services/users.service.js'
 
 
 export function getDefault(req:Request,res:Response){
