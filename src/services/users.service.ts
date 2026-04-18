@@ -1,4 +1,5 @@
- export interface User{
+import { UserModel } from "../models/users.model.js";
+export interface User{
         firstName: string;
         lastName: string;
         age: number;
@@ -17,58 +18,11 @@ const users:User[] = [
         "salary": 1800,
         "email": "ahmed.bensalah@gmail.com",
         "isMarried": false,
-        id:1
-    },
-    {
-        "firstName": "Yasmine",
-        "lastName": "Trabelsi",
-        "age": 32,
-        "salary": 2500,
-        "email": "yasmine.trabelsi@gmail.com",
-        "isMarried": true,
-        id:2
-    },
-    {
-        "firstName": "Mehdi",
-        "lastName": "Gharbi",
-        "age": 26,
-        "salary": 1500,
-        "email": "mehdi.gharbi@gmail.com",
-        "isMarried": false,
-        id:3
-    },
-    {
-        "firstName": "Amira",
-        "lastName": "Jaziri",
-        "age": 30,
-        "salary": 2200,
-        "email": "amira.jaziri@gmail.com",
-        "isMarried": true,
-          id:4,
-    },
-    {
-        id:5,
-        "firstName": "Walid",
-        "lastName": "Khlifi",
-        "age": 35,
-        "salary": 3000,
-        "email": "walid.khlifi@gmail.com",
-        "isMarried": true
-    },
-    {
-        "firstName": "Sarra",
-        "lastName": "Mansouri",
-        "age": 24,
-        "salary": 1200,
-        "email": "sarra.mansouri@gmail.com",
-        "isMarried": false,
-        id:6
+        "id":1
+
     },
 ];
-function generateId(): number {
-    if (users.length === 0) return 1
-    return Math.max(...users.map(u => u.id)) + 1  
-}
+
 
 export function getUsers():User[]{
     return users;
@@ -117,12 +71,13 @@ export function updateUserPartial(id:number,updateFields:Partial<User>):User|und
     }as User;
     return users[index]
 }
-export function addUser(user:User):void{
-    const newUser:User={
-        ...user,
-        id:generateId()
-    }
-    users.push(newUser)
+export async function addUser(user: User){
+  try {
+    const newUser = await UserModel.create(user);
+    return newUser;
+  } catch (error) {
+    console.error("Error creating user:", error);
+  }
 }
 export function deleteUserById(id:number):boolean{
     const index :number=users.findIndex((user)=>{

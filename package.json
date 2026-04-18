@@ -6,15 +6,16 @@
   "scripts": {
     "dev": "nodemon  --no-warnings -L --watch src --ext ts,json --exec node --loader ts-node/esm src/index.ts",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "lint":"eslint src --ext .ts",
-    "lint:fix":"eslint src --ext .ts --fix",
-    "typecheck":"tsc -p tsconfig.json --noEmit"
+    "lint": "eslint src --ext .ts",
+    "lint:fix": "eslint src --ext .ts --fix",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "module",
   "devDependencies": {
+    "@types/dotenv": "^6.1.1",
     "@types/express": "^5.0.6",
     "@types/node": "^25.5.0",
     "@typescript-eslint/eslint-plugin": "^8.58.0",
@@ -26,6 +27,9 @@
     "typescript": "^5.9.3"
   },
   "dependencies": {
-    "express": "^5.2.1"
+    "dotenv": "^17.4.1",
+    "express": "^5.2.1",
+    "mongodb": "^7.1.1",
+    "mongoose": "^9.4.1"
   }
 }
