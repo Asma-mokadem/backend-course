@@ -1,97 +1,107 @@
-import { type Request, type Response } from "express"
-import {createNewTodo,getTodoById,getTodos,updateTodo,patchTodo,deleteTodo, type Todo} from "../services/todos.service.js"
+import { type Request, type Response } from "express";
+import {
+  createNewTodo,
+  getTodoById,
+  getTodos,
+  updateTodo,
+  patchTodo,
+  deleteTodo,
+  type TodoInput,
+} from "../services/todos.service.js";
+import mongoose from "mongoose";
 
-export function getAllTodosController(req: Request, res: Response) {
-    const todos: Todo[] = getTodos()
+
+function isValidId(id: string): boolean {
+  return mongoose.Types.ObjectId.isValid(id);
+}
+
+export async function getAllTodosController(req: Request, res: Response) {
+  try {
+    const todos = await getTodos();
     if (!todos || todos.length === 0) {
-        return res.status(404).json({
-            message: "No todos found"
-        })
+      return res.status(404).json({ message: "No todos found" });
     }
-    res.status(200).json(todos)
+    res.status(200).json(todos);
+  } catch (error) {
+    res.status(500).json({ message: "Internal server error", error });
+  }
 }
-export function getTodoByIdController(req: Request, res: Response) {
-    const id = Number(req.params.id)
-    if (isNaN(id)) {
-        return res.status(400).json({
-            message: "ID must be a number"
-        })
+
+export async function getTodoByIdController(req: Request, res: Response) {
+  try {
+    const id  = String (req.params);
+    if (!isValidId(id)) {
+      return res.status(400).json({ message: "Invalid ID format" });
     }
-    const todo = getTodoById(id)
+    const todo = await getTodoById(id);
     if (!todo) {
-        return res.status(404).json({
-            message: "Todo not found"
-        })
+      return res.status(404).json({ message: "Todo not found" });
     }
-    res.status(200).json(todo)
+    res.status(200).json(todo);
+  } catch (error) {
+    res.status(500).json({ message: "Internal server error", error });
+  }
 }
 
-export function createNewTodoController(req: Request, res: Response) {
-    const newTodo = req.body
-    if (!newTodo) {
-        return res.status(400).json({
-            message: "Body is required"
-        })
+export async function createNewTodoController(req: Request, res: Response) {
+  try {
+    const body: TodoInput = req.body;
+    if (!body || !body.title) {
+      return res.status(400).json({ message: "Title is required" });
     }
-    createNewTodo(newTodo)
-    res.status(201).json({
-        message: "Todo created successfully"
-    })
+    const todo = await createNewTodo(body);
+    res.status(201).json({ message: "Todo created successfully", todo });
+  } catch (error) {
+    res.status(500).json({ message: "Internal server error", error });
+  }
 }
 
-export function updateTodoController(req: Request, res: Response) {
-    const id = Number(req.params.id)
-    const updatedTodo: Todo = req.body
-    if (isNaN(id)) {
-        return res.status(400).json({
-            message: "ID must be a number"
-        })
+export async function updateTodoController(req: Request, res: Response) {
+  try {
+    const id  = String (req.params);
+    if (!isValidId(id)) {
+      return res.status(400).json({ message: "Invalid ID format" });
     }
-    const existingTodo = getTodoById(id)
-    if (!existingTodo) {
-        return res.status(404).json({
-            message: "Todo not found"
-        })
+    const body: TodoInput = req.body;
+    const updated = await updateTodo(id, body);
+    if (!updated) {
+      return res.status(404).json({ message: "Todo not found" });
     }
-    updateTodo(updatedTodo, id)
-    res.status(200).json({
-        message: "Todo updated successfully"
-    })
+    res.status(200).json({ message: "Todo updated successfully", todo: updated });
+  } catch (error) {
+    res.status(500).json({ message: "Internal server error", error });
+  }
 }
-export function patchTodoController(req: Request, res: Response) {
-    const id = Number(req.params.id);
-    const updates = req.body;
-    if (isNaN(id)) {
-        return res.status(400).json({
-            message: "ID must be a number"
-        });
+
+export async function patchTodoController(req: Request, res: Response) {
+  try {
+    const id  = String (req.params);
+    if (!isValidId(id)) {
+      return res.status(400).json({ message: "Invalid ID format" });
     }
-    const existingTodo = getTodoById(id);
-    if (!existingTodo) {
-        return res.status(404).json({
-            message: "Todo not found"
-        });
+    const body: Partial<TodoInput> = req.body;
+    const patched = await patchTodo(id, body);
+    if (!patched) {
+      return res.status(404).json({ message: "Todo not found" });
     }
-    patchTodo(updates, id);
-    res.status(200).json({
-        message: "Todo patched successfully"
-    });
+    res.status(200).json({ message: "Todo patched successfully", todo: patched });
+  } catch (error) {
+    res.status(500).json({ message: "Internal server error", error });
+  }
 }
-export function deleteTodoController(req: Request, res: Response) {
-    const id = Number(req.params.id);
-    if (isNaN(id)) {
-        return res.status(400).json({
-            message: "ID must be a number"
-        });
+
+export async function deleteTodoController(req: Request, res: Response) {
+  try {
+    const id  = String (req.params);
+    if (!isValidId(id)) {
+      return res.status(400).json({ message: "Invalid ID format" });
     }
-    const existingTodo = getTodoById(id);
-    if (!existingTodo) {
-        return res.status(404).json({
-            message: "Todo not found"
-        });
+    const deleted = await deleteTodo(id);
+    if (!deleted) {
+      return res.status(404).json({ message: "Todo not found" });
     }
-    deleteTodo(id);
-    res.status(200).json({
-        message: "Todo deleted successfully"
-    });
+    res.status(200).json({ message: "Todo deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Internal server error", error });
+  }
 }

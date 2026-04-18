@@ -1,17 +1,18 @@
 import { type Request, type Response, type NextFunction } from "express";
 import { getUserById } from "../services/users.service.js";
-export const checkUserExists= ( req: Request,res: Response,next: NextFunction) =>{
-    const id=Number(req.params.id)
-    if(!id || isNaN(id)){
-        res.status(400).json({
-            message:"request invalid",
-            error:"Id must be a number or you must enter an ID"
-        })
+import mongoose from "mongoose";
+
+export const checkUserExists = async (req: Request,res: Response,next: NextFunction) => {
+    const  id  = String(req.params);
+    if (!id || !mongoose.Types.ObjectId.isValid(id)) {
+        return res.status(400).json({
+        message: "ID invalide ou manquant",
+        });
     }
-    const user=getUserById(id)
-    if(user===undefined){
-        return res.status(404).json({ message: "user not found" })
+    const user = await getUserById(id);
+    if (!user) {
+        return res.status(404).json({ message: "User not found" });
     }
-    (req as any).user=user
-    next()
-}
+    (req as Request & { user: typeof user }).user = user;
+    next();
+};
